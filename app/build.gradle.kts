@@ -3,6 +3,10 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id ("kotlin-kapt")
+    alias(libs.plugins.hilt)
+}
+kapt {
+    correctErrorTypes = true
 }
 
 android {
@@ -43,6 +47,10 @@ android {
 dependencies {
 
     implementation ("androidx.compose.material:material-icons-extended")
+
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+    implementation(libs.hilt.navigation.compose)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

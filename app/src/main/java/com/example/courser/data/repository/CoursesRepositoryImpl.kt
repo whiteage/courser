@@ -12,8 +12,9 @@ import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import javax.inject.Inject
 
-class CoursesRepositoryImpl(private val dao: DAO) : CoursesRepository {
+class CoursesRepositoryImpl @Inject constructor(private val dao: DAO) : CoursesRepository {
     val jsonUrl = "https://drive.usercontent.google.com/u/0/uc?id=15arTK7XT2b7Yv4BJsmDctA4Hg-BbS8-q&export=download"
     val api = RetrofitInstance.api
 

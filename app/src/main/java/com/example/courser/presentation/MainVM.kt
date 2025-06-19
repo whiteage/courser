@@ -1,5 +1,7 @@
 package com.example.courser.presentation
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,6 +14,7 @@ import com.example.courser.domain.usecases.FilterUseCase
 import com.example.courser.domain.usecases.GetAllCoursesFromDbUseCase
 import com.example.courser.domain.usecases.GetAllCoursesUseCase
 import com.example.courser.domain.usecases.GetAllLikedUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -19,16 +22,17 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MainVM() : ViewModel() {
-
-
-    val repository = CoursesRepositoryImpl(dao = )
-    val getAllCoursesUseCase = GetAllCoursesUseCase(repository)
-    val getAllLikedCourses = GetAllLikedUseCase(repository)
-    val getAllCoursesFromDbUseCase = GetAllCoursesFromDbUseCase(repository)
-    val filterBy = FilterUseCase(repository)
-    val auth = AuthUseCase(repository)
+@HiltViewModel
+class MainVM @Inject constructor(
+    private val getAllCoursesUseCase: GetAllCoursesUseCase,
+    private val getAllLikedCourses: GetAllLikedUseCase,
+    private val getAllCoursesFromDbUseCase : GetAllCoursesFromDbUseCase,
+    private val filterBy : FilterUseCase,
+    private val auth : AuthUseCase,
+    application: Application
+) : AndroidViewModel(application) {
 
 
     private val _sortedState = MutableLiveData<Boolean>(false)
@@ -63,17 +67,17 @@ class MainVM() : ViewModel() {
     }
 
 
-     fun filterTime() {
-         viewModelScope.launch {
-             val newState = !_sortedState.value!!
-             _sortedState.postValue(newState)
+    fun filterTime() {
+        viewModelScope.launch {
+            val newState = !_sortedState.value!!
+            _sortedState.postValue(newState)
 
-             val newList = if (newState) {
-                 getAllCoursesFromDbUseCase().first()
-             } else{
-                 filterBy.filterBy()
-             }
-             _filteredCourses.value = newList
-         }
+            val newList = if (newState) {
+                getAllCoursesFromDbUseCase().first()
+            } else{
+                filterBy.filterBy()
+            }
+            _filteredCourses.value = newList
+        }
     }
 }
