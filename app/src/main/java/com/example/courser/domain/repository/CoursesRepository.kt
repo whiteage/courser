@@ -8,7 +8,7 @@ interface CoursesRepository {
     suspend fun filterBy() : List<CourseItemEntity>
     suspend fun  getAllCourses()
     suspend fun searchCourses(string : String) : List<CourseItemEntity>
-    suspend fun setFavourite(cetegory : CourseItemEntity)
+    suspend fun setFavourite(category : CourseItemEntity)
     fun getAllCoursesFromDB() : Flow<List<CourseItemEntity>>
     fun getAllLiked() : Flow<List<CourseItemEntity>>
 

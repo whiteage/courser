@@ -47,7 +47,7 @@ fun TopBar() {
             placeholder = { Text("Search courses...") },
             leadingIcon = { Icon(Icons.Default.Search, null, tint = Color.White) },
             colors = TextFieldDefaults.textFieldColors(
-                containerColor = Color(0xFF1E1E1E),
+                containerColor = Color(0xFF24252A),
 
             ),
             modifier = Modifier.clip(RoundedCornerShape(26.dp)).weight(1f).height(56.dp),
@@ -57,7 +57,7 @@ fun TopBar() {
         Box(
             modifier = Modifier
                 .size(56.dp)
-                .background(Color(0xFF1E1E1E), CircleShape)
+                .background(Color(0xFF24252A), CircleShape)
                 .clip(CircleShape)
         ) {
             Icon(

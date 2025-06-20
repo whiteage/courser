@@ -34,24 +34,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.courser.R
 import com.example.courser.presentation.navigation.Screens
 
 @Composable
 fun MainScreen(viewModel: MainVM, navHostController: NavHostController) {
 
-    LaunchedEffect(Unit) {
-        viewModel.getAllCourses()
-    }
 
-
-    val currentRoute = navHostController.currentBackStackEntryAsState().value?.destination?.route
 
     val news = viewModel.courses.collectAsState()
 
@@ -59,43 +57,16 @@ fun MainScreen(viewModel: MainVM, navHostController: NavHostController) {
         containerColor = Color(0xFF121212),
         bottomBar =
         {
-            BottomAppBar(
-                modifier = Modifier.fillMaxWidth(),
-                containerColor = Color(0xFF1E1E1E)
-            ) {
-                Column(
-                    modifier = Modifier.weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Icon(Icons.Outlined.Home, contentDescription = "Главная", tint = if(currentRoute == Screens.MainScreen.route){ Color.Green} else{Color.White})
-                    Text(text = "Главная", color = if(currentRoute == Screens.MainScreen.route){ Color.Green} else{Color.White} , fontFamily = FontFamily.SansSerif)
-                }
-                Column(
-                    modifier = Modifier.weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Icon(Icons.Default.BookmarkBorder, contentDescription = "Избранное", tint = if(currentRoute == Screens.Favourite.route){ Color.Green} else{Color.White})
-                    Text(text = "Избранное", color = if(currentRoute == Screens.Favourite.route){ Color.Green} else{Color.White} , fontFamily = FontFamily.SansSerif)
-                }
-                Column(
-                    modifier = Modifier.weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Icon(Icons.Default.Person, contentDescription = "Аккаунт", tint = Color.White)
-                    Text(text = "Аккаунт", color = Color.White, fontFamily = FontFamily.SansSerif )
-                }
-            }}
-
-
+            BottomBar(navHostController)
+        }
     )
-
     {
         innerpadding ->
 
         if(news.value.isNotEmpty()){
             Column (modifier = Modifier.padding(innerpadding).fillMaxSize() ) {
                 TopBar()
-                Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(bottom = 10.dp).clickable { viewModel.filterTime() }) {
+                Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(bottom = 10.dp).clickable {  viewModel.toggleSort() }) {
                     Spacer(modifier = Modifier.weight(1f))
                     Text("По дате добавления", color = Color(0xFF12B956))
                     Spacer(modifier = Modifier.width(4.dp))
@@ -111,7 +82,7 @@ fun MainScreen(viewModel: MainVM, navHostController: NavHostController) {
                     contentPadding = PaddingValues(horizontal = 8.dp)
                 ) {
                     itemsIndexed(items = news.value) { _, item ->
-                        CourseCard(item)
+                        CourseCard(item,viewModel)
 
 
                     }

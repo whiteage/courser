@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.BookmarkBorder
@@ -36,37 +37,39 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
 import com.example.courser.R
 import com.example.courser.domain.entity.CourseItemEntity
+import com.example.courser.presentation.MainVM
 import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 
 @Composable
-fun CourseCard(course: CourseItemEntity) {
+fun CourseCard(course: CourseItemEntity, viewModel: MainVM) {
     Card(
         Modifier
             .fillMaxWidth()
             .padding(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1E1E))
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF24252A))
     ) {
         Column {
             Box(){
 
             Image(
-                painter = painterResource(id = R.drawable.ic_launcher_background),
-                contentDescription = null,
+                painter = painterResource(id = R.drawable.unnamed),
+                contentDescription = "Данковский в карточке",
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(114.dp)
                     .clip(RoundedCornerShape(16.dp)),
                 contentScale = ContentScale.Crop
             )
-                IconButton(onClick = {},
+                IconButton(onClick = {viewModel.setLike(course)},
                     Modifier.padding(top = 8.dp, end = 8.dp).background(shape = CircleShape, color = Color(0x32333A4D))
                     .height(28.dp).width(28.dp).align(Alignment.TopEnd)) {
                     if(course.hasLike){
                         Icon(
-                            Icons.Filled.BookmarkBorder,
+                            Icons.Filled.Bookmark,
                             "bookmark",
                             tint = Color.Green,
                             modifier = Modifier.align(Alignment.Center)

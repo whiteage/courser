@@ -1,5 +1,7 @@
 package com.example.courser.presentation.screens
 
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
@@ -30,8 +33,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -45,6 +51,7 @@ import okhttp3.internal.wait
 @Composable
 fun LoginScreen(viewModel : MainVM, navHostController: NavHostController) {
 
+    val context = LocalContext.current
     val logged = viewModel.readyToLogin.observeAsState(false)
     val email = remember { mutableStateOf("") }
     val pass = remember { mutableStateOf("") }
@@ -66,9 +73,10 @@ fun LoginScreen(viewModel : MainVM, navHostController: NavHostController) {
         Text(
             text = "Вход",
             modifier = Modifier.align(Alignment.Start),
+
             fontSize = 28.sp,
             color = Color.White,
-            fontWeight = FontWeight.Bold
+            fontFamily = FontFamily.SansSerif,
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -78,18 +86,20 @@ fun LoginScreen(viewModel : MainVM, navHostController: NavHostController) {
             modifier = Modifier.align(Alignment.Start),
             fontSize = 18.sp,
             color = Color.White,
-            fontWeight = FontWeight.Bold
+            fontFamily = FontFamily.SansSerif,
         )
 
         OutlinedTextField(
             value = email.value,
-            onValueChange = { newValue -> email.value = newValue },
-            placeholder = { Text("example@gmail.com") },
+            onValueChange = { newValue ->
+                email.value = newValue.filterNot { it in 'А'..'я' || it == 'ё' || it == 'Ё' }
+                            },
+            placeholder = { Text("example@gmail.com", fontFamily = FontFamily.SansSerif,) },
             singleLine = true,
             shape = RoundedCornerShape(18.dp),
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
             colors = TextFieldDefaults.textFieldColors(
-                containerColor = Color(0xFF1E1E1E),
+                containerColor = Color(0xFF32333A),
                 focusedTextColor = Color.White,
                 unfocusedTextColor = Color.White
             ),
@@ -102,18 +112,18 @@ fun LoginScreen(viewModel : MainVM, navHostController: NavHostController) {
             modifier = Modifier.align(Alignment.Start),
             fontSize = 18.sp,
             color = Color.White,
-            fontWeight = FontWeight.Bold
+             fontFamily = FontFamily.SansSerif,
         )
 
         OutlinedTextField(
             value = pass.value,
             onValueChange = { pass.value = it},
-            placeholder = { Text("Введите пароль") },
+            placeholder = { Text("Введите пароль", fontFamily = FontFamily.SansSerif,) },
             singleLine = true,
             shape = RoundedCornerShape(18.dp),
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
             colors = TextFieldDefaults.textFieldColors(
-                containerColor = Color(0xFF1E1E1E),
+                containerColor = Color(0xFF32333A),
                 focusedTextColor = Color.White,
                 unfocusedTextColor = Color.White
             ),
@@ -137,7 +147,7 @@ fun LoginScreen(viewModel : MainVM, navHostController: NavHostController) {
             shape = RoundedCornerShape(25.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF12B956))
         ) {
-            Text("Вход", color = Color.White)
+            Text("Вход", color = Color.White, fontFamily = FontFamily.SansSerif,)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -146,12 +156,12 @@ fun LoginScreen(viewModel : MainVM, navHostController: NavHostController) {
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Нету аккаунта?", color = Color.White)
+            Text("Нету аккаунта?", color = Color.White, fontFamily = FontFamily.SansSerif,)
             Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = "Регистрация",
                 color = Color(0xFF00C853),
-                fontWeight = FontWeight.Medium,
+                fontFamily = FontFamily.SansSerif,
                 modifier = Modifier.clickable { /* едем в регистрацию */ }
             )
         }
@@ -161,7 +171,8 @@ fun LoginScreen(viewModel : MainVM, navHostController: NavHostController) {
             color = Color(0xFF00C853),
             modifier = Modifier
                 .padding(top = 8.dp)
-                .clickable { /* едем в забыли пароль */ }
+                .clickable { /* едем в забыли пароль */ },
+            fontFamily = FontFamily.SansSerif,
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -175,7 +186,11 @@ fun LoginScreen(viewModel : MainVM, navHostController: NavHostController) {
             modifier = Modifier.fillMaxWidth()
         ) {
             Button(
-                onClick = { /* VK login */ },
+                onClick = {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://vk.com"))
+                    context.startActivity(intent)
+
+                },
                 colors = ButtonDefaults.buttonColors(Color(0xFF2683ED)),
                 modifier = Modifier
                     .weight(1f)
@@ -187,7 +202,11 @@ fun LoginScreen(viewModel : MainVM, navHostController: NavHostController) {
             }
 
             Button(
-                onClick = { /* OK login */ },
+                onClick = {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://ok.ru"))
+                    context.startActivity(intent)
+
+                },
                 colors = ButtonDefaults.buttonColors(Color(0xFFF95D00)),
                 modifier = Modifier
                     .weight(1f)

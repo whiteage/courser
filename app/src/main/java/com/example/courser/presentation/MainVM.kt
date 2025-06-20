@@ -4,23 +4,23 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.courser.data.repository.CoursesRepositoryImpl
 import com.example.courser.domain.entity.CourseItemEntity
 import com.example.courser.domain.usecases.AuthUseCase
 import com.example.courser.domain.usecases.FilterUseCase
 import com.example.courser.domain.usecases.GetAllCoursesFromDbUseCase
 import com.example.courser.domain.usecases.GetAllCoursesUseCase
 import com.example.courser.domain.usecases.GetAllLikedUseCase
+import com.example.courser.domain.usecases.SetFavouriteUseCase
+import com.example.courser.presentation.entity.SortOrder
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -31,14 +31,12 @@ class MainVM @Inject constructor(
     private val getAllCoursesFromDbUseCase : GetAllCoursesFromDbUseCase,
     private val filterBy : FilterUseCase,
     private val auth : AuthUseCase,
+    private val setFavourite : SetFavouriteUseCase,
     application: Application
 ) : AndroidViewModel(application) {
 
 
     private val _sortedState = MutableLiveData<Boolean>(false)
-
-    private val _filteredCourses = MutableStateFlow<List<CourseItemEntity>>(emptyList())
-    val filteredCourses: StateFlow<List<CourseItemEntity>> = _filteredCourses.asStateFlow()
 
 
     private val _readyToLogin = MutableLiveData<Boolean>()
@@ -48,8 +46,21 @@ class MainVM @Inject constructor(
         getAllCoursesUseCase.getAllCourses()
     }
 
-    val courses: StateFlow<List<CourseItemEntity>> = getAllCoursesFromDbUseCase()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    private val sortOrder = MutableStateFlow(SortOrder.NONE)
+
+    private val coursesFlow: Flow<List<CourseItemEntity>> = getAllCoursesFromDbUseCase()
+
+    val courses: StateFlow<List<CourseItemEntity>> = combine(
+        coursesFlow,
+        sortOrder
+    ) { courses, sort ->
+        when (sort) {
+            SortOrder.BY_DESC-> courses.sortedBy { it.publishDate }
+            SortOrder.NONE -> courses
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+
 
     val likedCourses : StateFlow<List<CourseItemEntity>> = getAllLikedCourses()
         .stateIn(viewModelScope,SharingStarted.WhileSubscribed(5000), emptyList())
@@ -61,23 +72,24 @@ class MainVM @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val initialList = getAllCoursesFromDbUseCase().first()
-            _filteredCourses.value = initialList
+            getAllCourses()
+
+        }
+    }
+
+    fun setLike(item : CourseItemEntity){
+        viewModelScope.launch {
+            setFavourite.setFavourite(item)
         }
     }
 
 
-    fun filterTime() {
-        viewModelScope.launch {
-            val newState = !_sortedState.value!!
-            _sortedState.postValue(newState)
-
-            val newList = if (newState) {
-                getAllCoursesFromDbUseCase().first()
-            } else{
-                filterBy.filterBy()
+    fun toggleSort(){
+        sortOrder.update {
+            when (it) {
+                SortOrder.NONE -> SortOrder.BY_DESC
+                SortOrder.BY_DESC -> SortOrder.NONE
             }
-            _filteredCourses.value = newList
         }
     }
 }

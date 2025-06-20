@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -37,7 +38,6 @@ import com.example.courser.presentation.navigation.Screens
 
 @Composable
 fun FavouriteScreen(navHostController : NavHostController, viewModel : MainVM) {
-    val currentRoute = navHostController.currentBackStackEntryAsState().value?.destination?.route
 
     val news = viewModel.likedCourses.collectAsState()
 
@@ -45,70 +45,38 @@ fun FavouriteScreen(navHostController : NavHostController, viewModel : MainVM) {
         containerColor = Color(0xFF121212),
         bottomBar =
         {
-            BottomAppBar(
-                modifier = Modifier.fillMaxWidth(),
-                containerColor = Color(0xFF1E1E1E)
-            ) {
-                Column(
-                    modifier = Modifier.weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Icon(
-                        Icons.Outlined.Home, contentDescription = "Главная", tint = if(currentRoute == Screens.MainScreen.route){ Color.Green} else{
-                            Color.White})
-                    Text(text = "Главная", color = if(currentRoute == Screens.MainScreen.route){ Color.Green} else{
-                        Color.White} , fontFamily = FontFamily.SansSerif)
-                }
-                Column(
-                    modifier = Modifier.weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Icon(
-                        Icons.Default.BookmarkBorder, contentDescription = "Избранное", tint = if(currentRoute == Screens.Favourite.route){ Color.Green} else{
-                            Color.White})
-                    Text(text = "Избранное", color = if(currentRoute == Screens.Favourite.route){ Color.Green} else{
-                        Color.White} , fontFamily = FontFamily.SansSerif)
-                }
-                Column(
-                    modifier = Modifier.weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Icon(Icons.Default.Person, contentDescription = "Аккаунт", tint = Color.White)
-                    Text(text = "Аккаунт", color = Color.White, fontFamily = FontFamily.SansSerif )
-                }
-            }
+            BottomBar(navHostController)
         }
 
 
     )
-
     {
             innerpadding ->
 
         if(news.value.isNotEmpty()){
             Column (modifier = Modifier.padding(innerpadding).fillMaxSize() ) {
-                TopBar()
-                Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(bottom = 10.dp).clickable { viewModel.filterTime() }) {
-                    Spacer(modifier = Modifier.weight(1f))
-                    Text("По дате добавления", color = Color(0xFF12B956))
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Icon(
-                        imageVector = Icons.Default.SwapVert,
-                        contentDescription = "Сортировка",
-                        modifier = Modifier.size(16.dp),
-                        tint = Color(0xFF12B956)
-                    )
-                }
+                Text(text = "Избранное", modifier = Modifier.padding(top = 16.dp, start = 16.dp), color = Color.White, fontFamily = FontFamily.SansSerif, fontSize = 28.sp)
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(horizontal = 8.dp)
                 ) {
                     itemsIndexed(items = news.value) { _, item ->
-                        CourseCard(item)
+                        CourseCard(item,viewModel)
 
 
                     }
                 }
+            }
+        }
+        else{
+            Column (modifier = Modifier.padding(innerpadding).fillMaxSize() ) {
+                Text(
+                    text = "Избранное",
+                    modifier = Modifier.padding(top = 16.dp, start = 16.dp),
+                    color = Color.White,
+                    fontFamily = FontFamily.SansSerif,
+                    fontSize = 28.sp
+                )
             }
         }
     }

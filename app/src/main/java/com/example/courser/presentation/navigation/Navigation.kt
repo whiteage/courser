@@ -5,6 +5,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.courser.presentation.MainVM
+import com.example.courser.presentation.screens.Account
 import com.example.courser.presentation.screens.FavouriteScreen
 import com.example.courser.presentation.screens.LoginScreen
 import com.example.courser.presentation.screens.MainScreen
@@ -24,6 +25,9 @@ fun Navigation(viewModel : MainVM){
         composable(Screens.Favourite.route) {
             FavouriteScreen(navHostController,viewModel)
 
+        }
+        composable(Screens.Account.route){
+            Account(navHostController)
         }
 
     }
